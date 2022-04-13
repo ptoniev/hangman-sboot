@@ -1,0 +1,8 @@
+spring:
+  mvc:
+    view:
+      prefix: /pages/
+      suffix: .jsp
+
+  main:
+    allow-bean-definition-overriding: true
