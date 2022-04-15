@@ -1,0 +1,80 @@
+package bg.petar.springboot.security;
+
+import org.apache.shiro.util.AntPathMatcher;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+import static bg.petar.springboot.security.ApplicationUserRole.*;
+
+
+@Configuration
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public AppSecurityConfig(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    @Bean
+    protected UserDetailsService userDetailsService() {
+        UserDetails annaSmithUser = User.builder()
+                .username("annasmith")
+                .password(passwordEncoder.encode("password"))
+                .roles(USER.name()) // ROLE_STUDENT
+                .build();
+
+        UserDetails lindaUser = User.builder()
+                .username("linda")
+                .password(passwordEncoder.encode("password123"))
+                .roles(ADMIN.name()) // ROLE_ADMIN
+                .build();
+
+
+//        UserDetails tomUser = User.builder()
+//                .username("")
+//                .password(passwordEncoder.encode(""))
+//                .roles(GUEST.name()) // ROLE_GUEST
+//                .build();
+        return new InMemoryUserDetailsManager(annaSmithUser, lindaUser);
+    }
+
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .csrf().disable()
+                .authorizeRequests().antMatchers("/login").permitAll()
+                .antMatchers("/play-as-guest/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/play-as-guest/**").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .formLogin()
+                .loginPage("/login").permitAll()
+                .and()
+                .logout().invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .logoutSuccessUrl("/logout-success").permitAll();
+    }
+
+}

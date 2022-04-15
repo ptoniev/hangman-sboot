@@ -27,6 +27,12 @@ public class HangmanUtils {
         return word;
     }
 
+    public String[] getAllWords() {
+        String[] words = {"Bmw", "Audi", "Mercedes", "Bentley", "Ferrari", "Opel", "Maseratti", "Fiat",
+                "Hyundai", "Volkswagen", "Tesla"};
+        return words;
+    }
+
     protected void initWordAndStore(HttpServletRequest request) {
         HttpSession session = request.getSession();
         String gameWord = getRandomWord();
@@ -58,4 +64,6 @@ public class HangmanUtils {
         int lettersNumber = gameWord.length();
         session.setAttribute("lettersNumber", lettersNumber);
     }
+
+
 }

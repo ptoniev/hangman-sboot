@@ -23,7 +23,10 @@ display: inline-block;
   <button type="submit" >Start a new game</button> </form>
   	</div>
 
-<li><a href="/game-page" >Start Game as a Guest</a></li>
+
+
+
+<a href="/logout" >Logout</a>
 
 </body>
 </html>

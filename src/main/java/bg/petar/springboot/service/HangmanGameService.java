@@ -43,7 +43,6 @@ public class HangmanGameService implements GameService {
 
     @Override
     public void makeTry(HttpServletRequest request, HttpServletResponse resp, HttpSession session)
-
             throws IOException {
         Character inputLetter = request.getParameter("guess").charAt(0);
         @SuppressWarnings("unchecked")
@@ -58,7 +57,6 @@ public class HangmanGameService implements GameService {
         }
         if (wrongGuesses >= 6) {
             resp.sendRedirect("defeatPage");
-
         }
         guessedLetters.add(Character.toUpperCase(inputLetter));
         session.setAttribute(HangmanUtils.GUESSED_LETTERS_ATTR, guessedLetters);
@@ -68,10 +66,7 @@ public class HangmanGameService implements GameService {
 
         }
 
-
         hangmanUtils.updateCensoredWord(request);
-        //resp.sendRedirect("/game/" + session.getAttribute("gameId"));
-       // return  "/game/" + session.getAttribute("gameId");
     }
 
     @Override
@@ -105,6 +100,10 @@ public class HangmanGameService implements GameService {
                 return "  ";
         }
 
+    }
+
+    public String[] getAllWordsForAdmin() {
+        return hangmanUtils.getAllWords();
     }
 }
 
