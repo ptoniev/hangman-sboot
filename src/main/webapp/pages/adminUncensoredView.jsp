@@ -27,6 +27,7 @@
 	<h1 class="menu-header">Guess like your life depends on it</h1>
 
 	<div class="game-menu">
+	<p> ${censoredWord} </p>
 	<p> ${gameWord} </p>
 
 	<p> The word contains ${lettersNumber} letters in total.
