@@ -1,6 +1,10 @@
 package bg.petar.springboot.service;
 
 
+import bg.petar.springboot.entities.Game;
+import bg.petar.springboot.entities.GameStatistic;
+import bg.petar.springboot.entities.Ranking;
+import bg.petar.springboot.utils.TableEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -9,18 +13,29 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
-public class HangmanGameService implements GameService {
+public class HangmanServiceImpl implements HangmanService {
 
     @Autowired
     HangmanUtils hangmanUtils;
 
+    @Autowired
+    GameService gameService;
+
+    @Autowired
+    RankingService rankingService;
+
+    @Autowired
+    GameStatisticService gameStatisticService;
+
     @Override
     public int getRandomGameId(HttpServletRequest request, HttpSession session) {
         Random obj = new Random();
-        int randId = obj.nextInt(50);
+        int randId = obj.nextInt(5000);
         session.setAttribute(HangmanUtils.GAME_ID_ATTR, randId);
         return randId;
     }
@@ -56,12 +71,18 @@ public class HangmanGameService implements GameService {
             session.setAttribute("picture", drawPicture(wrongGuesses));
         }
         if (wrongGuesses >= 6) {
+            Game game = new Game(gameWord, new GameStatistic( true, 6-wrongGuesses));
+            String playerName = (String) session.getAttribute("username");
+            saveGame(game, playerName);
             resp.sendRedirect("defeatPage");
+
         }
         guessedLetters.add(Character.toUpperCase(inputLetter));
         session.setAttribute(HangmanUtils.GUESSED_LETTERS_ATTR, guessedLetters);
         if (hasUserWon(request)) {
-
+            Game game = new Game(gameWord, new GameStatistic( true, 6-wrongGuesses));
+            String playerName = (String) session.getAttribute("username");
+            saveGame(game, playerName);
         resp.sendRedirect("victoryPage");
 
         }
@@ -104,6 +125,29 @@ public class HangmanGameService implements GameService {
 
     public String[] getAllWordsForAdmin() {
         return hangmanUtils.getAllWords();
+    }
+
+    public void saveGame(Game game, String playerName) {
+        Game savedGame = gameService.saveGame(game);
+        Ranking savedRanking = rankingService.updateGameRanking(game, playerName);
+        GameStatistic savedGameStatistic = gameStatisticService.updateGameStatisticRankingId(game.getGameStatistic(), savedRanking);
+    }
+
+    public void saveUsernameToContext(String userName, HttpSession session)
+    {
+        session.setAttribute("username", userName);
+    }
+
+    public List<TableEntry> getAllRankingsInTableEntries(){
+        List<Ranking> rankings = rankingService.findAll();
+        return rankings.stream().map((this::createTableEntry)).collect(Collectors.toList());
+    }
+
+    private TableEntry createTableEntry(Ranking ranking) {
+        TableEntry tableEntry = new TableEntry();
+        tableEntry.name = ranking.getPlayerName();
+        tableEntry.gamesWon = ranking.getGameStatisticList().size();
+        return tableEntry;
     }
 }
 

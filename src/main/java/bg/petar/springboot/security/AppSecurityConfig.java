@@ -47,7 +47,6 @@ public class AppSecurityConfig extends WebSecurityConfigurerAdapter {
                 .roles(ADMIN.name()) // ROLE_ADMIN
                 .build();
 
-
 //        UserDetails tomUser = User.builder()
 //                .username("")
 //                .password(passwordEncoder.encode(""))

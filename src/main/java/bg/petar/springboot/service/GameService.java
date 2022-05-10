@@ -1,18 +1,18 @@
 package bg.petar.springboot.service;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.IOException;
+import bg.petar.springboot.entities.Game;
+import bg.petar.springboot.repositories.GameRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-public interface GameService {
-    int getRandomGameId(HttpServletRequest request, HttpSession session);
+@Service
+public class GameService {
 
-    boolean hasUserWon(HttpServletRequest request);
+    @Autowired
+    private GameRepository gameRepository;
 
-    void makeTry(HttpServletRequest request, HttpServletResponse resp, HttpSession session) throws IOException;
 
-    void startNewGame(HttpServletRequest request, HttpSession session) throws IOException;
-
-    String drawPicture(int wrongGuesses);
+    public Game saveGame(Game game) {
+        return gameRepository.save(game);
+    }
 }
