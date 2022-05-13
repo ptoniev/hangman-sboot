@@ -1,7 +1,10 @@
 package bg.petar.springboot.entities;
 
+import org.hibernate.annotations.CurrentTimestamp;
+
 import javax.persistence.*;
-import java.util.ArrayList;
+import java.sql.Date;
+import java.time.Instant;
 import java.util.List;
 
 @Entity
@@ -15,7 +18,7 @@ public class Ranking {
     private String playerName;
     @OneToMany(mappedBy = "ranking", cascade = CascadeType.ALL)
     private List<GameStatistic> gameStatisticList;
-
+    private Date dateAttr = new Date(System.currentTimeMillis());
     public String getPlayerName() {
         return playerName;
     }
@@ -46,5 +49,13 @@ public class Ranking {
 
     public void setGameStatisticList(List<GameStatistic> gameStatisticList) {
         this.gameStatisticList = gameStatisticList;
+    }
+
+    public Date getDateAttr() {
+        return dateAttr;
+    }
+
+    public void setDateAttr(Date dateAttr) {
+        this.dateAttr = dateAttr;
     }
 }

@@ -4,6 +4,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 <%@ page import="java.util.ArrayList"%>
 <%@ page import="bg.petar.springboot.utils.TableEntry"%>
+<%@ page import="bg.petar.springboot.utils.TableEntryWithDate"%>
 <!DOCTYPE html>
 <html>
 <style type="text/css">
@@ -48,10 +49,11 @@ crossorigin="anonymous">
   </p>
   	</div>
 
+<br>
 
  <div align="center">
         <table border="1" cellpadding="5">
-            <caption><h2>Rankings</h2></caption>
+            <caption><h2>All time rankings</h2></caption>
             <tr>
                 <th>Name</th>
                 <th>Games Won</th>
@@ -65,10 +67,33 @@ crossorigin="anonymous">
                         <tr>
                             <td><%=s.name%></td>
                             <td><%=s.gamesWon%></td>
+
                         </tr>
                         <%}%>
         </table>
     </div>
 
+<div align="center">
+        <table border="1" cellpadding="5">
+            <caption><h2>Last 30 days</h2></caption>
+            <tr>
+                <th>Name</th>
+                <th>Games Won</th>
+                <th>Most Recent Activity</th>
+            </tr>
+
+            <%ArrayList<TableEntryWithDate> mtd =
+                        (ArrayList<TableEntryWithDate>)session.getAttribute("listOfUsersWithDate");
+                    for(TableEntryWithDate m:mtd){%>
+                    <%-- Arranging data in tabular form
+                    --%>
+                        <tr>
+                            <td><%=m.name%></td>
+                            <td><%=m.gamesWon%></td>
+                            <td><%=m.dateAttr%></td>
+                        </tr>
+                        <%}%>
+        </table>
+    </div>
 </body>
 </html>

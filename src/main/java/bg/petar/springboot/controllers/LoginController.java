@@ -3,6 +3,7 @@ package bg.petar.springboot.controllers;
 
 import bg.petar.springboot.service.HangmanServiceImpl;
 import bg.petar.springboot.utils.TableEntry;
+import bg.petar.springboot.utils.TableEntryWithDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,14 +17,14 @@ import java.util.List;
 import static java.util.Collections.reverse;
 
 @Controller
-public class LoginControllers {
+public class LoginController {
 
     @Autowired
     HangmanServiceImpl hangmanServiceImpl;
 
     @RequestMapping("/login")
     public String loadLoginPage(HttpServletRequest request, HttpSession session) {
-        System.out.println("First Login mapping");
+
         return "login";
     }
 
@@ -39,10 +40,15 @@ public class LoginControllers {
         listOfUsers.sort(Comparator.comparing(tableEntry -> tableEntry.gamesWon));
         reverse(listOfUsers);
 
+        List<TableEntryWithDate> listOfUsersWithDate = hangmanServiceImpl.getAllRankingsInTableEntriesWithDate();
+        listOfUsersWithDate.sort(Comparator.comparing(tableEntryWithDate -> tableEntryWithDate.gamesWon));
+        reverse(listOfUsersWithDate);
+
         if (principal != null) {
             hangmanServiceImpl.saveUsernameToContext(principal.getName(), session);
         }
         session.setAttribute("listOfUsers", listOfUsers);
+        session.setAttribute("listOfUsersWithDate", listOfUsersWithDate);
         return "index";
     }
 

@@ -5,6 +5,7 @@ import bg.petar.springboot.entities.Game;
 import bg.petar.springboot.entities.GameStatistic;
 import bg.petar.springboot.entities.Ranking;
 import bg.petar.springboot.utils.TableEntry;
+import bg.petar.springboot.utils.TableEntryWithDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -149,5 +150,20 @@ public class HangmanServiceImpl implements HangmanService {
         tableEntry.gamesWon = ranking.getGameStatisticList().size();
         return tableEntry;
     }
+
+    private TableEntryWithDate createTableEntryWithDate(Ranking ranking) {
+        TableEntryWithDate tableEntryWithDate = new TableEntryWithDate();
+        tableEntryWithDate.name = ranking.getPlayerName();
+        tableEntryWithDate.gamesWon = ranking.getGameStatisticList().size();
+        tableEntryWithDate.dateAttr = ranking.getDateAttr();
+        return tableEntryWithDate;
+    }
+
+    public List<TableEntryWithDate> getAllRankingsInTableEntriesWithDate(){
+        List<Ranking> rankings = rankingService.findAll();
+        return rankings.stream().map((this::createTableEntryWithDate)).collect(Collectors.toList());
+    }
+
+
 }
 

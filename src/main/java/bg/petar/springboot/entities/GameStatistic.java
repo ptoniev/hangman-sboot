@@ -1,6 +1,7 @@
 package bg.petar.springboot.entities;
 
 import javax.persistence.*;
+import java.time.Instant;
 
 @Entity
 @Table(name = "game_statistic")
@@ -11,8 +12,8 @@ public class GameStatistic {
     @Column(name = "id")
     private Long id;
 
-
     private boolean hasWon;
+
     private Integer numberOfTriesLeft;
 
     @OneToOne

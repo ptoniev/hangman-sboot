@@ -13,7 +13,7 @@ spring:
     password: spagetti8!
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
