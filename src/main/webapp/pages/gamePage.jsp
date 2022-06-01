@@ -2,6 +2,8 @@
 	pageEncoding="UTF-8"%>
 	<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 	<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+	<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+	<%@ page import="bg.petar.springboot.model.HangmanInput"%>
 <!DOCTYPE html>
 <html>
 
@@ -45,17 +47,17 @@ crossorigin="anonymous">
 		
 	 <pre> ${picture} </pre>
 	
-	<form class="game-form" method="post" action="/game/${gameId}">
+	<form:form class="game-form" method="post" action="/game/${gameId}" modelAttribute="hangmanInput">
 		<table>
 			<tr>
 				<td>Enter your guessed letter</td>
-				<td><input type="text" name="guess" required></td>
-				
-
-				
+				<td><form:input path="input" /></td><br>
+            <form:errors path="input"/>
 			</tr>
 		</table>
-	</form>
+
+		 <button type="submit" >Submit guess</button>
+	</form:form>
 	
 	<br>
 	<br>

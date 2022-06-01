@@ -1,5 +1,7 @@
 package bg.petar.springboot.entities;
 
+import net.minidev.json.annotate.JsonIgnore;
+
 import javax.persistence.*;
 import java.time.Instant;
 
@@ -12,33 +14,18 @@ public class GameStatistic {
     @Column(name = "id")
     private Long id;
 
-    private boolean hasWon;
-
-    private Integer numberOfTriesLeft;
-
     @OneToOne
     private Game game;
 
-    @ManyToOne
-    @JoinColumn(name="ranking_id")
-    private Ranking ranking;
+
+    private String playerName;
 
     public GameStatistic() {
     }
 
-    public GameStatistic( boolean hasWon, Integer numberOfTriesLeft) {
+    public GameStatistic(Game game) {
+        this.game = game;
 
-        this.hasWon = hasWon;
-        this.numberOfTriesLeft = numberOfTriesLeft;
-
-    }
-
-    public Ranking getRanking() {
-        return ranking;
-    }
-
-    public void setRanking(Ranking ranking) {
-        this.ranking = ranking;
     }
 
     public Long getId() {
@@ -49,22 +36,6 @@ public class GameStatistic {
         this.id = id;
     }
 
-    public boolean isHasWon() {
-        return hasWon;
-    }
-
-    public void setHasWon(boolean hasWon) {
-        this.hasWon = hasWon;
-    }
-
-    public Integer getNumberOfTriesLeft() {
-        return numberOfTriesLeft;
-    }
-
-    public void setNumberOfTriesLeft(Integer numberOfTriesLeft) {
-        this.numberOfTriesLeft = numberOfTriesLeft;
-    }
-
     public Game getGame() {
         return game;
     }
@@ -73,4 +44,11 @@ public class GameStatistic {
         this.game = game;
     }
 
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
 }

@@ -5,6 +5,8 @@ import bg.petar.springboot.repositories.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class GameService {
 
@@ -14,5 +16,9 @@ public class GameService {
 
     public Game saveGame(Game game) {
         return gameRepository.save(game);
+    }
+
+    public Optional<Game> getById(Long id) {
+        return gameRepository.findById(id);
     }
 }

@@ -2,6 +2,7 @@ package bg.petar.springboot.service;
 
 import bg.petar.springboot.entities.Game;
 import bg.petar.springboot.entities.Ranking;
+import bg.petar.springboot.repositories.GameStatisticRepository;
 import bg.petar.springboot.repositories.RankingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,9 @@ public class RankingService {
     private RankingRepository rankingRepository;
 
     @Autowired
+    private GameStatisticRepository gameStatisticRepository;
+
+    @Autowired
     private GameService gameService;
 
     public Ranking updateGameRanking(Game game, String playerName) {
@@ -23,7 +27,8 @@ public class RankingService {
         {
             ranking = new Ranking(new ArrayList<>(), playerName);
         }
-        ranking.getGameStatisticList().add(game.getGameStatistic());
+        //todo gamestatisticsservice
+        ranking.getGameStatisticList().add(gameStatisticRepository.findByGameId(game.getId()).get());
         return rankingRepository.save(ranking);
     }
 

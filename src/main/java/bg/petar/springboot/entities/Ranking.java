@@ -1,5 +1,6 @@
 package bg.petar.springboot.entities;
 
+import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.CurrentTimestamp;
 
 import javax.persistence.*;
@@ -16,7 +17,9 @@ public class Ranking {
     private Long id;
 
     private String playerName;
-    @OneToMany(mappedBy = "ranking", cascade = CascadeType.ALL)
+    @OneToMany
+    @JoinColumn(name = "ranking_id")
+    @JsonIgnore
     private List<GameStatistic> gameStatisticList;
     private Date dateAttr = new Date(System.currentTimeMillis());
     public String getPlayerName() {
