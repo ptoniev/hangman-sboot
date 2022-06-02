@@ -46,7 +46,7 @@ crossorigin="anonymous">
 	<p> You have ${6 - wrongGuessNumber } tries left!</p>
 		
 	 <pre> ${picture} </pre>
-	
+	${gameId}
 	<form:form class="game-form" method="post" action="/game/${gameId}" modelAttribute="hangmanInput">
 		<table>
 			<tr>

@@ -5,6 +5,7 @@ import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table
@@ -17,6 +18,7 @@ public class Game {
     private boolean isOver;
     private int numberOfTriesLeft;
     private String progressWord;
+    String guessedLetters;
 
     public Game() {
     }
@@ -63,6 +65,14 @@ public class Game {
 
     public void setProgressWord(String progressWord) {
         this.progressWord = progressWord;
+    }
+
+    public String getGuessedLetters() {
+        return guessedLetters;
+    }
+
+    public void setGuessedLetters(String guessedLetters) {
+        this.guessedLetters = guessedLetters;
     }
 
     @Override

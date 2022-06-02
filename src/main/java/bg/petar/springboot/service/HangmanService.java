@@ -10,16 +10,16 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.security.Principal;
 
 public interface HangmanService {
-    int getRandomGameId(HttpServletRequest request, HttpSession session);
 
-    boolean hasUserWon(HttpServletRequest request);
+    boolean hasUserWon(Game game);
 
-    void makeTry(HangmanInput hangmanInput)
+    String makeTry(HangmanInput hangmanInput, Long gameId, String playerName)
             throws IOException;
 
-    Game startNewGame(HttpServletRequest request, HttpSession session) throws IOException;
+    Game startNewGame() throws IOException;
 
     String drawPicture(int wrongGuesses);
 }

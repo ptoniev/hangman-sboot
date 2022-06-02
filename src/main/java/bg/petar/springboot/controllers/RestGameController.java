@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,10 +62,14 @@ public class RestGameController {
 
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{gameId}")
-    public ResponseEntity<Game> makeTry(@PathVariable Long gameId, @RequestBody HangmanInput hangmanInput) throws IOException {
+    public ResponseEntity<Game> makeTry(@PathVariable Long gameId, @RequestBody HangmanInput hangmanInput, Principal principal) throws IOException {
         Optional<Game> optionalGame = gameRepository.findById(gameId);
+        String playerName = null;
+        if(principal!=null){
+            playerName = principal.getName();
+        }
         if(optionalGame.isPresent()){
-            hangmanService.makeTry(hangmanInput);
+            hangmanService.makeTry(hangmanInput, gameId, playerName);
 
             return new ResponseEntity<>(optionalGame.get(), HttpStatus.OK);
                     }

@@ -24,7 +24,7 @@ crossorigin="anonymous">
 <div class="victory-page">
 <h1>Congratulations! You have won the game! </h1> <br>
 
-<p>The complete word is: ${gameWord} </p>
+
 <br>
 <form class="start-game-form" method="post" action="/game">
   <button type="submit" >Start a new game</button> </form>

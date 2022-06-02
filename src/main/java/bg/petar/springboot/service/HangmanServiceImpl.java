@@ -18,6 +18,7 @@ import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -49,46 +50,43 @@ public class HangmanServiceImpl implements HangmanService {
     HttpSession session;
 
     @Override
-    public int getRandomGameId(HttpServletRequest request, HttpSession session) {
-        Random obj = new Random();
-        int randId = obj.nextInt(5000);
-        session.setAttribute(HangmanUtils.GAME_ID_ATTR, randId);
-        return randId;
-    }
+    public boolean hasUserWon(Game game) {
 
-    @Override
-    public boolean hasUserWon(HttpServletRequest request) {
-        HttpSession session = request.getSession();
         @SuppressWarnings("unchecked")
-        HashSet<Character> guessedLetters =
-                (HashSet<Character>) session.getAttribute(HangmanUtils.GUESSED_LETTERS_ATTR);
-        String word = (String) session.getAttribute(HangmanUtils.GAME_WORD_ATTR);
-        for (int i = 1; i < word.length() - 1; i++) {
-            if (!guessedLetters.contains(word.charAt(i))) {
-                return false;
-            }
-        }
-        return true;
+        // HashSet<Character> guessedLetters = (HashSet<Character>) game.getGuessedLetters();
+        //     (HashSet<Character>) session.getAttribute(HangmanUtils.GUESSED_LETTERS_ATTR);
+        String progressWord = game.getProgressWord();
 
+        //(String) session.getAttribute(HangmanUtils.GAME_WORD_ATTR);
+//        for (int i = 1; i < word.length() - 1; i++) {
+//            if (!guessedLetters.contains(word.charAt(i))) {
+//                return false;
+//            }
+//        }
+//        return true;
+        if (progressWord.contains("_")) {
+            return false;
+        } else return true;
     }
 
     @Override
-    public void makeTry(HangmanInput hangmanInput)
+    public String makeTry(HangmanInput hangmanInput, Long gameId, String playerName)
             throws IOException {
         Character inputLetter = hangmanInput.getInput().charAt(0);
         @SuppressWarnings("unchecked")
-        HashSet<Character> guessedLetters =
-                (HashSet<Character>) session.getAttribute(HangmanUtils.GUESSED_LETTERS_ATTR);
-        String gameWord = (String) session.getAttribute(HangmanUtils.GAME_WORD_ATTR);
-        int wrongGuesses = (int) session.getAttribute(HangmanUtils.WRONG_GUESS_NUMBER_ATTR);
-        String playerName = (String) session.getAttribute("username");
-        Long currentId = (Long) session.getAttribute("gameId");
 
-        Optional<Game> optionalGame = gameService.getById(currentId);
+        Optional<Game> optionalGame = gameService.getById(gameId);
         Game game;
-        if(optionalGame.isPresent())
-        game = optionalGame.get(); else
-        return;
+
+        if (optionalGame.isPresent())
+            game = optionalGame.get();
+        else
+            return "index";
+
+
+        //  (HashSet<Character>) session.getAttribute(HangmanUtils.GUESSED_LETTERS_ATTR);
+        String gameWord = game.getGameWord();
+        int wrongGuesses = (6 - game.getNumberOfTriesLeft());
 
         if (gameWord.indexOf(Character.toUpperCase(inputLetter)) == -1) {
             wrongGuesses++;
@@ -98,34 +96,42 @@ public class HangmanServiceImpl implements HangmanService {
         if (wrongGuesses >= 6) {
             game.setOver(true);
             saveGame(game, playerName);
-            response.sendRedirect("defeatPage");
 
+            return "defeatPage";
         }
-        guessedLetters.add(Character.toUpperCase(inputLetter));
-        session.setAttribute(HangmanUtils.GUESSED_LETTERS_ATTR, guessedLetters);
-        if (hasUserWon(request)) {
+
+        game.setGuessedLetters((game.getGuessedLetters() + inputLetter).toUpperCase());
+//        session.setAttribute(HangmanUtils.GUESSED_LETTERS_ATTR, guessedLetters);
+        hangmanUtils.updateCensoredWord(game);
+        if (hasUserWon(game)) {
             game.setOver(true);
             saveGame(game, playerName);
-        response.sendRedirect("victoryPage");
+            return "victoryPage";
 
         }
-        hangmanUtils.updateCensoredWord(request);
-        game.setNumberOfTriesLeft(6-wrongGuesses);
-        game.setProgressWord((String) session.getAttribute("censoredWord"));
+
+        game.setNumberOfTriesLeft(6 - wrongGuesses);
+        // game.setProgressWord((String) session.getAttribute("censoredWord"));
         saveGame(game, playerName);
+        return "gamePage";
     }
 
     @Override
-    public Game startNewGame(HttpServletRequest request, HttpSession session)
+    public Game startNewGame()
             throws IOException {
+        Game game = new Game();
+        game.setNumberOfTriesLeft(6);
+        game.setGuessedLetters("");
         session.setAttribute("picture", "");
-        hangmanUtils.initWordAndStore(request);
-        hangmanUtils.countLettersInGameWord(request);
-       String gameWord = (String) session.getAttribute(HangmanUtils.GAME_WORD_ATTR);
-        Game game = new Game(gameWord);
+        session.setAttribute(HangmanUtils.WRONG_GUESS_NUMBER_ATTR, (6 - game.getNumberOfTriesLeft()));
+        hangmanUtils.initWordAndStore(game);
+        hangmanUtils.countLettersInGameWord(game);
+
+        // String gameWord = (String) session.getAttribute(HangmanUtils.GAME_WORD_ATTR);
+        //Game game = new Game(gameWord);
         gameService.saveGame(game);
-              session.setAttribute("gameId", game.getId());
-              return game;
+        //     session.setAttribute("gameId", game.getId());
+        return game;
     }
 
     @Override
@@ -163,12 +169,11 @@ public class HangmanServiceImpl implements HangmanService {
 
     }
 
-    public void saveUsernameToContext(String userName, HttpSession session)
-    {
+    public void saveUsernameToContext(String userName, HttpSession session) {
         session.setAttribute("username", userName);
     }
 
-    public List<TableEntry> getAllRankingsInTableEntries(){
+    public List<TableEntry> getAllRankingsInTableEntries() {
         List<Ranking> rankings = rankingService.findAll();
         return rankings.stream().map((this::createTableEntry)).collect(Collectors.toList());
     }
@@ -188,7 +193,7 @@ public class HangmanServiceImpl implements HangmanService {
         return tableEntryWithDate;
     }
 
-    public List<TableEntryWithDate> getAllRankingsInTableEntriesWithDate(){
+    public List<TableEntryWithDate> getAllRankingsInTableEntriesWithDate() {
         List<Ranking> rankings = rankingService.findAll();
         return rankings.stream().map((this::createTableEntryWithDate)).collect(Collectors.toList());
     }

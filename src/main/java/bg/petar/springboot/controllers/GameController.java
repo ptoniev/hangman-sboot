@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.security.Principal;
 
 
 @Controller
@@ -34,30 +35,37 @@ public class GameController {
     HttpSession session;
 
     @PostMapping(path = "/game")
-    public RedirectView startGame(@ModelAttribute("hangmanInput") HangmanInput hangmanInput) throws IOException {
+    public RedirectView startGame(@ModelAttribute("hangmanInput") HangmanInput hangmanInput, Model model) throws IOException {
 
-        Game game = hangmanGameService.startNewGame(request, session);
+        Game game = hangmanGameService.startNewGame();
         System.out.println(game);
-        System.out.println(session.getAttribute("gameId"));
         // When the game start button is clicked we want to redirect to specific game Id
         //response.sendRedirect("/game/" + session.getAttribute("gameId"));
         return new RedirectView(request.getContextPath()+ "/game/" + game.getId());
             }
 
     @GetMapping(path = "/game/{gameId}")
-    public String processGameStart(@ModelAttribute("hangmanInput") HangmanInput hangmanInput)
+    public String processGameStart(@PathVariable(required = false) Long gameId, @ModelAttribute("hangmanInput") HangmanInput hangmanInput, Model model)
     {
+
+        model.addAttribute("gameId", gameId);
+
         return "gamePage";
     }
 
     @PostMapping(path = "/game/{gameId}")
-    public String playGame(@Valid @ModelAttribute("hangmanInput") HangmanInput hangmanInput, BindingResult br)
+    public String playGame(@Valid @ModelAttribute("hangmanInput") HangmanInput hangmanInput, BindingResult br,
+                           @PathVariable Long gameId, Principal principal)
             throws IOException {
         if(br.hasErrors()){
             return "gamePage";
         }
-        hangmanGameService.makeTry(hangmanInput);
-        return "gamePage";
+        String playerName = null;
+        if(principal!=null)
+        {
+            playerName = principal.getName();
+        }
+        return hangmanGameService.makeTry(hangmanInput, gameId, playerName);
     }
 
 
