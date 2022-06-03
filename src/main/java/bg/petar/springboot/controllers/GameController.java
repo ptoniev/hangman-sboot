@@ -26,30 +26,18 @@ public class GameController {
     HangmanServiceImpl hangmanGameService;
 
     @Autowired
-    HttpServletResponse response;
-
-    @Autowired
     HttpServletRequest request;
-
-    @Autowired
-    HttpSession session;
 
     @PostMapping(path = "/game")
     public RedirectView startGame(@ModelAttribute("hangmanInput") HangmanInput hangmanInput, Model model) throws IOException {
 
         Game game = hangmanGameService.startNewGame();
-        System.out.println(game);
-        // When the game start button is clicked we want to redirect to specific game Id
-        //response.sendRedirect("/game/" + session.getAttribute("gameId"));
-        return new RedirectView(request.getContextPath()+ "/game/" + game.getId());
-            }
+        return new RedirectView(request.getContextPath() + "/game/" + game.getId());
+    }
 
     @GetMapping(path = "/game/{gameId}")
-    public String processGameStart(@PathVariable(required = false) Long gameId, @ModelAttribute("hangmanInput") HangmanInput hangmanInput, Model model)
-    {
-
+    public String processGameStart(@PathVariable(required = false) Long gameId, @ModelAttribute("hangmanInput") HangmanInput hangmanInput, Model model) {
         model.addAttribute("gameId", gameId);
-
         return "gamePage";
     }
 
@@ -57,12 +45,11 @@ public class GameController {
     public String playGame(@Valid @ModelAttribute("hangmanInput") HangmanInput hangmanInput, BindingResult br,
                            @PathVariable Long gameId, Principal principal)
             throws IOException {
-        if(br.hasErrors()){
+        if (br.hasErrors()) {
             return "gamePage";
         }
         String playerName = null;
-        if(principal!=null)
-        {
+        if (principal != null) {
             playerName = principal.getName();
         }
         return hangmanGameService.makeTry(hangmanInput, gameId, playerName);
@@ -70,11 +57,12 @@ public class GameController {
 
 
     @GetMapping("/game/victoryPage")
-    public String loadVictoryPage(){
+    public String loadVictoryPage() {
         return "victoryPage";
     }
+
     @GetMapping("/game/defeatPage")
-    public String loadDefeatPage(){
+    public String loadDefeatPage() {
         return "defeatPage";
     }
 
@@ -82,7 +70,7 @@ public class GameController {
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseBody
     public String[] getAllWordsForAdmin() {
-       return hangmanGameService.getAllWordsForAdmin();
+        return hangmanGameService.getAllWordsForAdmin();
     }
 
     @GetMapping("/uncensored-word")

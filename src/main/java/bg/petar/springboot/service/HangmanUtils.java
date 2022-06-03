@@ -10,10 +10,7 @@ import java.util.Random;
 
 @Component
 public class HangmanUtils {
-    protected static final String GAME_WORD_ATTR = "gameWord";
     protected static final String WRONG_GUESS_NUMBER_ATTR = "wrongGuessNumber";
-    protected static final String GUESSED_LETTERS_ATTR = "guessedLetters";
-    protected static final String GAME_ID_ATTR = "gameId";
 
     @Autowired
     HttpServletRequest request;
@@ -37,22 +34,13 @@ public class HangmanUtils {
     }
 
     protected void initWordAndStore(Game game) {
-        // HttpSession session = request.getSession();
         String gameWord = getRandomWord();
         game.setGameWord(gameWord);
-        //   game.setGuessedLetters(new HashSet<Character>());
-//        session.setAttribute(GAME_WORD_ATTR, gameWord);
-//        session.setAttribute(WRONG_GUESS_NUMBER_ATTR, 0);
-//        session.setAttribute(GUESSED_LETTERS_ATTR, new HashSet<Character>());
         updateCensoredWord(game);
-
     }
 
     protected void updateCensoredWord(Game game) {
         HttpSession session = request.getSession();
-        @SuppressWarnings("unchecked")
-//        HashSet<Character> guessedLetters =
-//                (HashSet<Character>) game.getGuessedLetters();
         String word = game.getGameWord();
         String wordToReturn = word;
         for (int i = 1; i < word.length() - 1; i++) {

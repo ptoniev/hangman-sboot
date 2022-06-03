@@ -41,29 +41,13 @@ public class HangmanServiceImpl implements HangmanService {
     GameStatisticService gameStatisticService;
 
     @Autowired
-    HttpServletRequest request;
-
-    @Autowired
-    HttpServletResponse response;
-
-    @Autowired
     HttpSession session;
 
     @Override
     public boolean hasUserWon(Game game) {
-
         @SuppressWarnings("unchecked")
-        // HashSet<Character> guessedLetters = (HashSet<Character>) game.getGuessedLetters();
-        //     (HashSet<Character>) session.getAttribute(HangmanUtils.GUESSED_LETTERS_ATTR);
-        String progressWord = game.getProgressWord();
 
-        //(String) session.getAttribute(HangmanUtils.GAME_WORD_ATTR);
-//        for (int i = 1; i < word.length() - 1; i++) {
-//            if (!guessedLetters.contains(word.charAt(i))) {
-//                return false;
-//            }
-//        }
-//        return true;
+        String progressWord = game.getProgressWord();
         if (progressWord.contains("_")) {
             return false;
         } else return true;
@@ -74,17 +58,13 @@ public class HangmanServiceImpl implements HangmanService {
             throws IOException {
         Character inputLetter = hangmanInput.getInput().charAt(0);
         @SuppressWarnings("unchecked")
-
         Optional<Game> optionalGame = gameService.getById(gameId);
         Game game;
-
         if (optionalGame.isPresent())
             game = optionalGame.get();
         else
             return "index";
 
-
-        //  (HashSet<Character>) session.getAttribute(HangmanUtils.GUESSED_LETTERS_ATTR);
         String gameWord = game.getGameWord();
         int wrongGuesses = (6 - game.getNumberOfTriesLeft());
 
@@ -96,22 +76,16 @@ public class HangmanServiceImpl implements HangmanService {
         if (wrongGuesses >= 6) {
             game.setOver(true);
             saveGame(game, playerName);
-
             return "defeatPage";
         }
-
         game.setGuessedLetters((game.getGuessedLetters() + inputLetter).toUpperCase());
-//        session.setAttribute(HangmanUtils.GUESSED_LETTERS_ATTR, guessedLetters);
         hangmanUtils.updateCensoredWord(game);
         if (hasUserWon(game)) {
             game.setOver(true);
             saveGame(game, playerName);
             return "victoryPage";
-
         }
-
         game.setNumberOfTriesLeft(6 - wrongGuesses);
-        // game.setProgressWord((String) session.getAttribute("censoredWord"));
         saveGame(game, playerName);
         return "gamePage";
     }
@@ -126,11 +100,8 @@ public class HangmanServiceImpl implements HangmanService {
         session.setAttribute(HangmanUtils.WRONG_GUESS_NUMBER_ATTR, (6 - game.getNumberOfTriesLeft()));
         hangmanUtils.initWordAndStore(game);
         hangmanUtils.countLettersInGameWord(game);
-
-        // String gameWord = (String) session.getAttribute(HangmanUtils.GAME_WORD_ATTR);
-        //Game game = new Game(gameWord);
         gameService.saveGame(game);
-        //     session.setAttribute("gameId", game.getId());
+
         return game;
     }
 
